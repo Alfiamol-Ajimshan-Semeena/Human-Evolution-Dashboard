@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Evolution Dashboard</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Link to External CSS -->
+    <link rel="stylesheet" href="styles/main.css">
+
+    <!-- Load D3.js -->
+    <script src="libs/d3/d3.v7.min.js"></script>
+
+    <!-- Adding TopoJSON Dependency for Geographical Map -->
+    <script src="https://unpkg.com/topojson-client@3"></script>
+    <script src="scripts/geographicalMap.js"></script>
+</head>
+<body>
+
+    <h1><i class="fas fa-users"></i> Human Evolution</h1>
+  
+    
+    <!-- Dashboards insights box-->
+    <div class="insights-box">
+        <div class="insight-item">
+            <span class="insight-label"><i class="fas fa-dna"></i> Total Species:</span>
+            <span class="insight-value" id="total-species">0</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-label"><i class="fas fa-clock"></i> Time Period (Million Years Ago):</span>
+            <span class="insight-value" id="time-period">0M-0M</span>
+        </div>  
+    </div>
+    
+    <!-- Filters & User Controls -->
+    <div class="controls">
+        <label for="species"><i class="fas fa-user-friends"></i> Select Species:</label>
+        <select id="species">
+            <option value="All">All</option>
+        </select>
+
+        <label for="timeRange"><i class="fas fa-hourglass-half"></i> Time Range (Million Years Ago):</label>
+        <input type="range" id="timeRange" min="0" max="7" step="1" value="7">
+        <span id="timeValue">7M</span>
+
+        <label for="region"><i class="fas fa-globe-americas"></i> Select Region:</label>
+        <select id="region">
+            <option value="All">All</option>
+        </select>
+    </div>
+    
+    <div id="tooltip" style="position:absolute; visibility:hidden; background:black; color:white; padding:5px; border-radius:5px;"></div>
+    
+    <!--Human evolution animation-->
+    <div class="slider">
+        <div class="slide">
+            <img src="styles/images/human1.png" alt="Human Evolution 1">
+        </div>
+        <div class="slide fade">
+            <img src="styles/images/human2.png" alt="Human Evolution 2">
+        </div>
+        <div class="slide fade">
+            <img src="styles/images/human3.png" alt="Human Evolution 3">
+        </div>
+        <div class="slide fade">
+            <img src="styles/images/human4.png" alt="Human Evolution 4">
+        </div>
+        <div class="slide fade">
+            <img src="styles/images/human5.png" alt="Human Evolution 5">
+        </div>
+        <div class="slide fade">
+            <img src="styles/images/human6.png" alt="Human Evolution 6">
+        </div>
+        <div class="slide fade">
+            <img src="styles/images/human7.png" alt="Human Evolution 7">
+        </div> 
+    </div>
+    <!--Title and icons for plots-->
+    <h2 class="family-title"><i class="fas fa-tree"></i> Evolutionary Tree</h2>
+    <div id="family-container">
+    </div>
+    
+    <h2 class="timeline-title"><i class="fas fa-timeline"></i> Timeline Chart</h2>
+    <div id="timeline-container"></div> 
+    
+    <h2 class="stackedbar-title"><i class="fas fa-tools"></i> Technology and Time-Period</h2>
+    <div id="stackedbar-container"></div>
+    
+    <h2 class="bar-title"><i class="fas fa-map-marked-alt"></i> Species Frequency by Zone</h2>
+    <div id="bar-chart-container" class="chart-box"></div>
+    
+    <h2 class="pie-title"><i class="fas fa-chart-pie"></i> Species Distribution by Location</h2>
+    <div id="pie-chart-container" class="chart-box"></div>
+    
+    <h2 class="line-title"><i class="fas fa-tooth"></i> Incisor and Canine Size over Time</h2>
+    <div id="line-chart-container"></div>
+    
+    <div class="chart-box">
+        <h2><i class="fas fa-map"></i> Geographical Map</h2>
+        <svg id="mapChart" width="700" height="500"></svg>
+    </div> 
+    
+    <h2 class="butterfly-title"><i class="fas fa-arrows-alt-v"></i> Body Size Comparison</h2> 
+    <div id="butterfly-chart"></div>
+    
+    <h2 class="treemap-title"><i class="fas fa-mountain"></i> Species Count in each Habitat</h2> 
+    <div id="tree-map"></div>
+    
+    <h2 class="bubble-title"><i class="fas fa-utensils"></i> Diet vs. Jaw Shape & Canine Size</h2>
+    <div id="bubble-chart-container"></div>
+
+<!-- Summary Insights Box -->
+ <div id="summary-insights">
+   
+    <h2 style="text-align: center; font-family: 'Orbitron', sans-serif; margin-bottom: 15px;">
+        <i class="fas fa-lightbulb"></i> Key Evolutionary Insights
+    </h2>
+
+    <div id="overall-insights">
+        <h3><i class="fas fa-chart-bar"></i> Overall Insights</h3>
+        <p id="overall-summary">Loading...</p>
+    </div>
+
+    <div id="dynamic-insights">
+        <!-- Insights for each chart -->
+        <div class="insight-card">
+            <h3><i class="fas fa-users"></i> Species Distribution</h3>
+            <p id="species-distribution-insight">Loading...</p>
+        </div>
+
+        <div class="insight-card">
+            <h3><i class="fas fa-timeline"></i> Timeline Chart Insights</h3>
+            <p id="timeline-chart-insight">Loading...</p>
+        </div>
+
+        <div class="insight-card">
+            <h3><i class="fas fa-tools"></i> Stacked Bar Chart Insights</h3>
+            <p id="stackedbar-chart-insight">Loading...</p>
+        </div>
+
+        <div class="insight-card">
+            <h3><i class="fas fa-map-marked-alt"></i> Bar Chart Insights</h3>
+            <p id="bar-chart-insight">Loading...</p>
+        </div>
+
+        <div class="insight-card">
+            <h3><i class="fas fa-chart-pie"></i> Pie Chart Insights</h3>
+            <p id="pie-chart-insight">Loading...</p>
+        </div>
+
+        <div class="insight-card">
+            <h3><i class="fas fa-tooth"></i> Line Chart Insights</h3>
+            <p id="line-chart-insight">Loading...</p>
+        </div>
+
+        <div class="insight-card">
+            <h3><i class="fas fa-map"></i> Geographical Map Insights</h3>
+            <p id="map-chart-insight">Loading...</p>
+        </div>
+
+        <div class="insight-card">
+            <h3><i class="fas fa-arrows-alt-v"></i> Butterfly Chart Insights</h3>
+            <p id="butterfly-chart-insight">Loading...</p>
+        </div>
+
+        <div class="insight-card">
+            <h3><i class="fas fa-mountain"></i> Treemap Insights</h3>
+            <p id="treemap-chart-insight">Loading...</p>
+        </div>
+
+        <div class="insight-card">
+            <h3><i class="fas fa-utensils"></i> Bubble Chart Insights</h3>
+            <p id="bubble-chart-insight">Loading...</p>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Link to External JavaScript -->
+    <script src="scripts/main.js"></script>
+    <script src="scripts/timeline.js"></script>
+    <script src="scripts/stackedbar.js"></script>
+    <script src="scripts/ButterflyChart.js"></script>
+    <script src="scripts/Treemap.js"></script>
+    <script src="scripts/piechart.js"></script>
+    <script src="scripts/BarChart.js"></script>
+    <script src="scripts/linechart.js"></script>
+    <script src="scripts/bubbleChart.js"></script>
+    <script src="scripts/treelayout.js"></script>
+</body>
+</html>
